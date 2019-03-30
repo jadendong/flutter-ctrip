@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_ctrip/navigator/tab_navigator.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(MyApp());
 
@@ -25,15 +26,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String showResult = '';
-
-  Future<CommonModel> fetchPost() async {
-    final response = await http
-        .get('http://www.devio.org/io/flutter_app/json/test_common_model.json');
-    Utf8Decoder utf8decoder = Utf8Decoder();
-    final result = json.decode(utf8decoder.convert(response.bodyBytes));
-    return CommonModel.fromJson(result);
-  }
+  String countString = '';
+  String localCount = '';
 
   @override
   Widget build(BuildContext context) {
@@ -42,57 +36,43 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: Text('Future与FutureBuilder实用技巧'),
         ),
-        body: FutureBuilder<CommonModel>(
-          future: fetchPost(),
-          builder: (BuildContext context, AsyncSnapshot<CommonModel> snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.none:
-                return Text('Input a URL to start');
-              case ConnectionState.waiting:
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              case ConnectionState.active:
-                return Text('active');
-              case ConnectionState.done:
-                if (snapshot.hasError) {
-                  return Text('${snapshot.error}',
-                      style: TextStyle(color: Colors.red));
-                } else {
-                  return Column(
-                    children: <Widget>[
-                      Text('icon:${snapshot.data.icon}'),
-                      Text('statusBarColor:${snapshot.data.statusBarColor}'),
-                      Text('title:${snapshot.data.title}'),
-                      Text('url:${snapshot.data.url}'),
-                    ],
-                  );
-                }
-            }
-          },
+        body: Column(
+          children: <Widget>[
+            RaisedButton(
+              onPressed: _incrementCounter,
+              child: Text('increment Count'),
+            ),
+            RaisedButton(
+              onPressed: _getCounter,
+              child: Text('Get Count'),
+            ),
+            Text(
+              countString,
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              localCount,
+              style: TextStyle(fontSize: 20),
+            ),
+          ],
         ),
       ),
     );
   }
-}
 
-class CommonModel {
-  final String icon;
-  final String title;
-  final String url;
-  final String statusBarColor;
-  final bool hideAppBar;
+  _incrementCounter() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      countString = countString + "1";
+    });
+    int counter = (prefs.getInt('counter') ?? 0) + 1;
+    await prefs.setInt('counter', counter);
+  }
 
-  CommonModel(
-      {this.icon, this.title, this.url, this.statusBarColor, this.hideAppBar});
-
-  factory CommonModel.fromJson(Map<String, dynamic> json) {
-    return CommonModel(
-      icon: json['icon'],
-      title: json['title'],
-      url: json['url'],
-      statusBarColor: json['statusBarColor'],
-      hideAppBar: json['hideAppBar'],
-    );
+  _getCounter() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      localCount = prefs.getInt('counter').toString();
+    });
   }
 }
