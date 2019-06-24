@@ -1,14 +1,11 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_ctrip/navigator/tab_navigator.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(MyApp());
 
 //class MyApp extends StatelessWidget {
-//  @override
+//  @overridek'k'k'k
 //  Widget build(BuildContext context) {
 //    return MaterialApp(
 //      title: 'Flutter Demo',
@@ -47,11 +44,11 @@ class _MyAppState extends State<MyApp> {
               child: Text('Get Count'),
             ),
             Text(
-              countString,
+              "countString: " + countString,
               style: TextStyle(fontSize: 20),
             ),
             Text(
-              localCount,
+              "result: " + localCount,
               style: TextStyle(fontSize: 20),
             ),
           ],
